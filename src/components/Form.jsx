@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
+import Error from './Error';
+import PropTypes from 'prop-types';
 
-const Form = () => {
-  //State del formulario
-  const [search, setSearch] = useState({
-    city: '',
-    country: '',
-  });
+const Form = ({ search, setSearch, setConsult }) => {
   const [error, setError] = useState(false);
 
   // Extraer ciudad y pais
@@ -32,11 +29,12 @@ const Form = () => {
     setError(false);
 
     //Enviar a componente principal
+    setConsult(true);
   };
 
   return (
     <form action="" onSubmit={handleSubmit}>
-      {error ? <p className="red darken-4 error">All fields are required</p> : null}
+      {error ? <Error message="All fields are required" /> : null}
       <div className="input-field col s12">
         <input type="text" name="city" id="city" value={city} onChange={handleChange} />
         <label htmlFor="city">City: </label>
@@ -63,6 +61,12 @@ const Form = () => {
       </div>
     </form>
   );
+};
+
+Form.propTypes = {
+  search: PropTypes.object.isRequired,
+  setSearch: PropTypes.func.isRequired,
+  setConsult: PropTypes.func.isRequired,
 };
 
 export default Form;

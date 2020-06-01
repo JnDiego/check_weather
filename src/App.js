@@ -1,8 +1,51 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import Header from './components/Header';
 import Form from './components/Form';
+import Weather from './components/Weather';
+import Error from './components/Error';
 
 function App() {
+  //State del formulario
+  const [search, setSearch] = useState({
+    city: '',
+    country: '',
+  });
+  // Extraer ciudad y pais
+  const { city, country } = search;
+
+  const [consult, setConsult] = useState(false);
+  const [result, setResult] = useState({});
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const fetchApi = async () => {
+      if (consult) {
+        const appId = '';
+        const url = `http://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${appId}`;
+        const response = await fetch(url);
+        const result = await response.json();
+
+        setResult(result);
+        setConsult(false);
+
+        // Detecta si hubo resultados correctos en la consulta
+        if (result.cod === '404') {
+          setError(true);
+        } else {
+          setError(false);
+        }
+      }
+    };
+    fetchApi();
+  }, [city, consult, country]);
+
+  let component;
+  if (error) {
+    component = <Error message="No results" />;
+  } else {
+    component = <Weather result={result} />;
+  }
+
   return (
     <Fragment>
       <Header title="Weather Application" />
@@ -10,9 +53,9 @@ function App() {
         <div className="container">
           <div className="row">
             <div className="col m6 s12">
-              <Form />
+              <Form search={search} setSearch={setSearch} setConsult={setConsult} />
             </div>
-            <div className="col m6 s12">2</div>
+            <div className="col m6 s12">{component}</div>
           </div>
         </div>
       </div>
